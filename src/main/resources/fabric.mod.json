@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "allsounds",
+  "version": "${version}",
+  "name": "AllSounds",
+  "description": "Play all the sounds in block game Pag",
+  "authors": ["Wurgo"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/allsounds/icon.png",
+  "environment": "*",
+  "mixins": [
+    "allsounds.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "minecraft": "1.16.1"
+  }
+}
