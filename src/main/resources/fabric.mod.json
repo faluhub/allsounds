@@ -8,7 +8,7 @@
   "contact": {},
   "license": "MIT",
   "icon": "assets/allsounds/icon.png",
-  "environment": "*",
+  "environment": "client",
   "mixins": [
     "allsounds.mixins.json"
   ],

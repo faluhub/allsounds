@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.io.IOException;
+
 @Mixin(CreateWorldScreen.class)
 public class CreateWorldScreenMixin extends Screen {
     protected CreateWorldScreenMixin(Text title) {
@@ -16,9 +18,7 @@ public class CreateWorldScreenMixin extends Screen {
     }
 
     @Inject(at = @At("TAIL"), method = "createLevel")
-    public void allsounds_cws_createLevel(CallbackInfo ci) {
-        AllSounds.playedSounds.clear();
-
-        AllSounds.log("Cleared played sounds.");
+    public void allsounds_cws_createLevel(CallbackInfo ci) throws IOException {
+        AllSounds.clearSounds();
     }
 }

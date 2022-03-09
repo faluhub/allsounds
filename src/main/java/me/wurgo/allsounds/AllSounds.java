@@ -4,8 +4,6 @@ import com.google.common.collect.Maps;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.LanguageDefinition;
-import net.minecraft.client.resource.language.LanguageManager;
-import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -26,8 +24,6 @@ public class AllSounds {
     public static final String MOD_ID = MOD_NAME.toLowerCase();
 
     private static final Logger LOGGER = LogManager.getLogger(MOD_ID);
-
-    public static ArrayList<String> playedSounds = new ArrayList<>();
 
     public static JSONArray getSounds() throws IOException {
         JSONParser parser = new JSONParser();
@@ -55,6 +51,19 @@ public class AllSounds {
         writer.flush();
 
         log("Added sound '" + sound + "' to played sounds.");
+    }
+
+    public static void clearSounds() throws IOException {
+        JSONArray sounds = getSounds();
+        sounds.clear();
+
+        File soundsFile = new File(FabricLoader.getInstance().getConfigDir() + "/sounds.json");
+        FileWriter writer = new FileWriter(soundsFile);
+
+        writer.write(sounds.toJSONString());
+        writer.flush();
+
+        log("Cleared sounds.");
     }
 
     public static ArrayList<String> getRemainingSounds() throws IOException {
