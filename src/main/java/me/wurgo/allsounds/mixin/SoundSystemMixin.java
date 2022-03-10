@@ -12,13 +12,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Mixin(SoundSystem.class)
 public class SoundSystemMixin {
     @Shadow @Final private SoundManager loader;
     @Shadow @Final private List<SoundInstanceListener> listeners;
-    @Shadow @Final private Channel channel;
     @Shadow private boolean started;
 
     @Inject(at = @At("TAIL"), method = "play(Lnet/minecraft/client/sound/SoundInstance;)V")
@@ -30,22 +28,17 @@ public class SoundSystemMixin {
 
                 if (weightedSoundSet != null && sound != SoundManager.MISSING_SOUND) {
                     if (!this.listeners.isEmpty()) {
-                        CompletableFuture<Channel.SourceManager> completableFuture = this.channel.createSource(sound.isStreamed() ? SoundEngine.RunMode.STREAMING : SoundEngine.RunMode.STATIC);
-                        Channel.SourceManager sourceManager = completableFuture.join();
+                        Text subtitle = weightedSoundSet.getSubtitle();
 
-                        if (sourceManager != null) {
-                            Text subtitle = weightedSoundSet.getSubtitle();
+                        if (subtitle != null) {
+                            String strSubtitle = subtitle.toString().split("'")[1];
 
-                            if (subtitle != null) {
-                                String strSubtitle = subtitle.toString().split("'")[1];
-
-                                try {
-                                    if (!AllSounds.getSounds().contains(strSubtitle)) {
-                                        AllSounds.addSound(strSubtitle);
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                            try {
+                                if (!AllSounds.getSounds().contains(strSubtitle)) {
+                                    AllSounds.addSound(strSubtitle);
                                 }
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
                         }
                     }
