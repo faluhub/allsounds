@@ -15,10 +15,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AllSounds {
     public static final String MOD_NAME = "AllSounds";
@@ -72,7 +69,7 @@ public class AllSounds {
     public static ArrayList<String> getRemainingSounds() throws IOException {
         ArrayList<String> remaining = new ArrayList<>();
         JSONArray done = getSounds();
-        Map<String, String> map = loadLangFile();
+        Map<String, String> map = sortByValue(loadLangFile());
 
         map.forEach((v, k) -> {
             if (v.startsWith("subtitles") && !done.contains(v)) {
@@ -80,7 +77,6 @@ public class AllSounds {
             }
         });
 
-        Collections.sort(remaining);
         return remaining;
     }
 
@@ -139,6 +135,18 @@ public class AllSounds {
         }
 
         return map;
+    }
+
+    private static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());
+        list.sort(Map.Entry.comparingByValue());
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+
+        return result;
     }
 
     public static void log(String message) {
