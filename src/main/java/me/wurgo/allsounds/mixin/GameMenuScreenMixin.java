@@ -29,6 +29,8 @@ public class GameMenuScreenMixin extends Screen {
 
     @Inject(at = @At("TAIL"), method = "init")
     public void allsounds_gms_init(CallbackInfo ci) {
+        newTitle = "Remaining Sounds";
+
         try {
             List<Integer> minMax = AllSounds.getMinMax();
             newTitle += " (" + minMax.get(0) + "/" + minMax.get(1) + ")";
@@ -43,7 +45,6 @@ public class GameMenuScreenMixin extends Screen {
                 (button) -> {
                     if (this.client != null) {
                         this.client.openScreen(new RemainingSoundsScreen(newTitle, this));
-                        newTitle = "Remaining Sounds";
                     }
                 }
         );
