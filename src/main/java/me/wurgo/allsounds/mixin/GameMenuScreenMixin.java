@@ -1,5 +1,6 @@
 package me.wurgo.allsounds.mixin;
 
+import me.wurgo.allsounds.AllSounds;
 import me.wurgo.allsounds.RemainingSoundsScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -13,10 +14,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.io.IOException;
+import java.util.List;
+
 @Mixin(GameMenuScreen.class)
 public class GameMenuScreenMixin extends Screen {
     private static final Identifier ARROW = new Identifier("textures/item/arrow.png");
     private static ButtonWidget remainingButton;
+    private static String newTitle = "Remaining Sounds";
 
     protected GameMenuScreenMixin(Text title) {
         super(title);
@@ -24,13 +29,22 @@ public class GameMenuScreenMixin extends Screen {
 
     @Inject(at = @At("TAIL"), method = "init")
     public void allsounds_gms_init(CallbackInfo ci) {
+        try {
+            List<Integer> minMax = AllSounds.getMinMax();
+            newTitle += " (" + minMax.get(0) + "/" + minMax.get(1) + ")";
+        }
+        catch (IOException e) { e.printStackTrace(); }
+
         remainingButton = new ButtonWidget(
                 this.width / 2 + 102 + 5,
                 this.height / 4 + 24 - 16,
                 20, 20,
                 new LiteralText(""),
                 (button) -> {
-                    if (this.client != null) { this.client.openScreen(new RemainingSoundsScreen(this)); }
+                    if (this.client != null) {
+                        this.client.openScreen(new RemainingSoundsScreen(newTitle, this));
+                        newTitle = "Remaining Sounds";
+                    }
                 }
         );
         this.addButton(remainingButton);

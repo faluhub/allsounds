@@ -16,6 +16,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,8 @@ public class AllSounds {
     public static final String MOD_ID = MOD_NAME.toLowerCase();
 
     private static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+    private static int total = 0;
+    private static int completed = 0;
 
     public static JSONArray getSounds() throws IOException {
         JSONParser parser = new JSONParser();
@@ -69,7 +72,43 @@ public class AllSounds {
     public static ArrayList<String> getRemainingSounds() throws IOException {
         ArrayList<String> remaining = new ArrayList<>();
         JSONArray done = getSounds();
+        Map<String, String> map = loadLangFile();
 
+        map.forEach((v, k) -> {
+            if (v.startsWith("subtitles") && !done.contains(v)) {
+                remaining.add(v);
+            }
+        });
+
+        Collections.sort(remaining);
+        return remaining;
+    }
+
+    public static List<Integer> getMinMax() throws IOException {
+        List<Integer> list = new ArrayList<>();
+
+        JSONArray done = getSounds();
+        Map<String, String> lang = loadLangFile();
+
+        total = 0;
+        completed = 0;
+
+        lang.forEach((v, k) -> {
+            if (v.startsWith("subtitles")) {
+                total++;
+                if (done.contains(v)) {
+                    completed++;
+                }
+            }
+        });
+
+        list.add(completed);
+        list.add(total);
+
+        return list;
+    }
+
+    private static Map<String, String> loadLangFile() {
         ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
         List<LanguageDefinition> definitions = new ArrayList<>();
         definitions.add(MinecraftClient.getInstance().getLanguageManager().getLanguage());
@@ -82,7 +121,16 @@ public class AllSounds {
             for (String string2 : resourceManager.getAllNamespaces()) {
                 try {
                     Identifier identifier = new Identifier(string2, string);
-                    loadLangFile(resourceManager.getAllResources(identifier), map);
+
+                    for (Resource resource : resourceManager.getAllResources(identifier)) {
+                        try {
+                            try (InputStream inputStream = resource.getInputStream()) {
+                                Language.load(inputStream, map::put);
+                            }
+                        } catch (IOException var17) {
+                            LOGGER.warn("Failed to load translations from {}", resource, var17);
+                        }
+                    }
                 } catch (FileNotFoundException ignored) {
                 } catch (Exception var11) {
                     LOGGER.warn("Skipped language file: {}:{} ({})", string2, string, var11.toString());
@@ -90,25 +138,7 @@ public class AllSounds {
             }
         }
 
-        map.forEach((v, k) -> {
-            if (v.startsWith("subtitles") && !done.contains(v)) {
-                remaining.add(v);
-            }
-        });
-
-        return remaining;
-    }
-
-    private static void loadLangFile(List<Resource> resources, Map<String, String> translationMap) {
-        for (Resource resource : resources) {
-            try {
-                try (InputStream inputStream = resource.getInputStream()) {
-                    Language.load(inputStream, translationMap::put);
-                }
-            } catch (IOException var17) {
-                LOGGER.warn("Failed to load translations from {}", resource, var17);
-            }
-        }
+        return map;
     }
 
     public static void log(String message) {
