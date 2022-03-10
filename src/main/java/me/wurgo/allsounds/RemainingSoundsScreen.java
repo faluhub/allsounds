@@ -18,8 +18,9 @@ public class RemainingSoundsScreen extends Screen {
     private final Screen parent;
     private RemainingSoundsListWidget remainingSoundsListWidget;
 
-    public RemainingSoundsScreen(Screen parent) {
-        super(new LiteralText("Remaining Sounds"));
+    public RemainingSoundsScreen(String title, Screen parent) {
+        super(new LiteralText(title));
+
         this.parent = parent;
     }
 
@@ -43,8 +44,8 @@ public class RemainingSoundsScreen extends Screen {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (this.remainingSoundsListWidget != null) { this.remainingSoundsListWidget.render(matrices, mouseX, mouseY, delta); }
-        this.drawCenteredText(matrices, textRenderer, this.title, this.width / 2, 13, 16777215);
 
+        this.drawCenteredText(matrices, textRenderer, this.title, this.width / 2, 13, 16777215);
         super.render(matrices, mouseX, mouseY, delta);
     }
 
@@ -64,6 +65,10 @@ public class RemainingSoundsScreen extends Screen {
                 SoundEntry soundEntry = new SoundEntry(s);
                 this.addEntry(soundEntry);
             }
+
+            if (this.getSelected() != null) {
+                this.centerScrollOn(this.getSelected());
+            }
         }
 
         protected int getScrollbarPositionX() { return super.getScrollbarPositionX() + 20; }
@@ -80,9 +85,7 @@ public class RemainingSoundsScreen extends Screen {
         public class SoundEntry extends AlwaysSelectedEntryListWidget.Entry<RemainingSoundsListWidget.SoundEntry> {
             private final String key;
 
-            public SoundEntry(String key) {
-                this.key = key;
-            }
+            public SoundEntry(String key) { this.key = key; }
 
             public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 RemainingSoundsScreen.this.textRenderer.drawWithShadow(
