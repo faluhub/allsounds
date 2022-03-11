@@ -9,7 +9,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -19,6 +21,8 @@ import java.util.List;
 
 @Mixin(GameMenuScreen.class)
 public class GameMenuScreenMixin extends Screen {
+    @Shadow @Final private boolean showMenu;
+
     private static final Identifier ARROW = new Identifier("textures/item/arrow.png");
     private static ButtonWidget remainingButton;
     private static String newTitle = "Remaining Sounds";
@@ -27,8 +31,8 @@ public class GameMenuScreenMixin extends Screen {
         super(title);
     }
 
-    @Inject(at = @At("TAIL"), method = "init")
-    public void allsounds_gms_init(CallbackInfo ci) {
+    @Inject(at = @At("TAIL"), method = "initWidgets")
+    public void allsounds_gms_initWidgets(CallbackInfo ci) {
         newTitle = "Remaining Sounds";
 
         try {
@@ -53,7 +57,7 @@ public class GameMenuScreenMixin extends Screen {
 
     @Inject(at = @At("TAIL"), method = "render")
     public void allsounds_gms_render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (this.client != null) {
+        if (this.client != null && this.showMenu) {
             this.client.getTextureManager().bindTexture(ARROW);
             drawTexture(
                     matrices,
