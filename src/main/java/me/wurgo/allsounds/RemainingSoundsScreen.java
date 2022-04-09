@@ -32,7 +32,15 @@ public class RemainingSoundsScreen extends Screen {
         }
         catch (IOException e) { e.printStackTrace(); }
 
-        this.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 38, 200, 20, ScreenTexts.DONE, (buttonWidget) -> {
+        this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 38, 150, 20, new LiteralText("Clear Sounds"), (buttonWidget) -> {
+            try {
+                AllSounds.clearSounds();
+                if (this.client != null) {
+                    this.client.openScreen(this.parent);
+                }
+            } catch (IOException ignored) {}
+        }));
+        this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 38, 150, 20, ScreenTexts.DONE, (buttonWidget) -> {
             if (this.client != null) {
                 this.client.openScreen(this.parent);
             }
